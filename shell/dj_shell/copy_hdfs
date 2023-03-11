@@ -1,0 +1,2 @@
+hadoop distcp -Dmapreduce.job.queuename=root.zw03.hadoop-waimaiadrd.ad -m 2000 /user/hadoop-hmart-waimaiad/zhangjin/data/list_ctr_platform_merge_field viewfs://hadoop-meituan/zw03mlnn01/user/hadoop-hmart-waimaiad/dongjian03/data
+hadoop distcp -Dmapreduce.job.queuename=root.zw03.hadoop-waimaiadrd.ad -m 2000 /user/hadoop-hmart-waimaiad/zhangjin/data/list_ctr_platform_merge_field_test viewfs://hadoop-meituan/zw03mlnn01/user/hadoop-hmart-waimaiad/dongjian03/data

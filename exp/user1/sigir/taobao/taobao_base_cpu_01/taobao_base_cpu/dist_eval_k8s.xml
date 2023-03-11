@@ -1,0 +1,271 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+
+<configuration>
+    <!--#注释掉原有的virtual env配置，使用下面两个组合-->
+    <property>
+        <name>afo.container.mode</name>
+        <value>host</value>
+    </property>
+    <property>
+        <name>afo.engine.tensorflow.virtualenv.name</name>
+        <value>tf1.10_mt1.0.5</value>
+    </property>
+    <property>
+        <name>afo.app.virtualenv.version.tf1.10_mt1.0.5.path</name>
+        <value>viewfs://hadoop-meituan/ghnn01/hadoop-hdp/wuyongyu02/build/tf1.15_mt1.2.1-centos6-cpu-venv-stepfix.tar.gz</value>
+    </property>
+    <property>
+        <name>afo.venv.path</name>
+        <value>viewfs://hadoop-meituan/ghnn01/hadoop-hdp/wuyongyu02/build/tf1.15_mt1.2.1-centos6-cpu-venv-stepfix.tar.gz</value>
+    </property>
+    <!--支持节点容错-->
+    <property>
+        <name>afo.app.support.engine.failover</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>afo.engine.wait_for_job_finished</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>afo.app.name</name>
+        <value>afo_app_name</value>
+    </property>
+    <property>
+        <name>afo.app.queue</name>
+        <value>root.zw05_training_cluster.hadoop-waimaiadrd.cpu_job</value>
+    </property>
+    <property>
+        <name>afo.role.worker.env.AFO_PEFETCH_PROCESS</name>
+        <value>8</value>
+    </property>
+    <!--角色       个数        vcores  memory-->
+    <!--ps        4 ~ 8        48改为40     150G改为100G-->
+    <!--worker    100 ~ 300    20     16G-->
+    <!--chief     1            5      16G-->
+    <!--eval      0 ~ 1        40     100G-->
+    <property>
+        <name>parameter.servers</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>parameter.server.memory</name>
+        <value>50400</value>
+    </property>
+    <property>
+        <name>parameter.server.vcore</name>
+        <value>32</value>
+    </property>
+    <property>
+        <name>parameter.server.gpu</name>
+        <value>0</value>
+    </property>
+
+    <property>
+        <name>workers</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>worker.memory</name>
+        <value>20480</value>
+    </property>
+    <property>
+        <name>worker.vcore</name>
+        <value>16</value>
+    </property>
+    <property>
+        <name>worker.gpu</name>
+        <value>0</value>
+    </property>
+
+    <property>
+        <name>with.chief</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>chief.memory</name>
+        <value>32768</value>
+    </property>
+    <property>
+        <name>chief.vcore</name>
+        <value>8</value>
+    </property>
+    <property>
+        <name>chief.gpu</name>
+        <value>0</value>
+    </property>
+
+    <property>
+        <name>evaluators</name>
+        <value>0</value>
+    </property>
+    <property>
+        <name>evaluator.memory</name>
+        <value>40960</value>
+    </property>
+    <property>
+        <name>evaluator.vcore</name>
+        <value>8</value>
+    </property>
+    <property>
+        <name>evaluator.gpu</name>
+        <value>0</value>
+    </property>
+
+    <!-- defined ps/worker train_task python script -->
+    <property>
+        <name>parameter.server.script</name>
+        <value>python train_eval.py</value>
+    </property>
+    <property>
+        <name>worker.script</name>
+        <value>python train_eval.py</value>
+    </property>
+    <property>
+        <name>chief.script</name>
+        <value>python train_eval.py</value>
+    </property>
+    <property>
+        <name>evaluator.script</name>
+        <value>python train_eval.py</value>
+    </property>
+
+    <property>
+        <name>with.tensor.board</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>board.log_dir</name>
+        <value>viewfs://hadoop-meituan/user/hadoop-hmart-waimaiad/zhangjin/model/list_ctr_platform_side_model_info_model/20221110</value>
+    </property>
+
+    <property>
+        <name>finish.by.chief</name>
+        <value>true</value>
+    </property>
+    <!-- 在finish.by.chief为true时，如果之前配置过afo.role.worker.exit-with-chief=true，则需要将其设置为false，否则worker会在worker0结束后退出，这是旧版本的API-->
+    <property>
+        <name>afo.role.worker.exit-with-chief</name>
+        <value>false</value>
+    </property>
+
+    <!-- 是否使用统一数据分发 -->
+    <property>
+        <name>afo.use.data.dispatch</name>
+        <value>true</value>
+    </property>
+
+    <!-- batch_size，和python代码中保持一致 -->
+    <property>
+        <name>args.batch_size</name>
+        <value>1000</value>
+    </property>
+
+    <!-- 训练数据的目录 -->
+    <property>
+        <name>args.train_data</name>
+        <value>viewfs://hadoop-meituan/user/hadoop-hmart-waimaiad/zhangjin/data/list_ctr_platform_side_model_info/20221110</value>
+    </property>
+    <!-- evaluate 数据路径如下配置 -->
+    <property>
+        <name>args.valid_data</name>
+        <value>viewfs://hadoop-meituan/user/hadoop-hmart-waimaiad/zhangjin/data/list_ctr_platform_side_model_info/20221110</value>
+    </property>
+
+    <!-- 模型checkpoint保存的目录 -->
+    <property>
+        <name>args.model_ckpt_dir</name>
+        <value>viewfs://hadoop-meituan/user/hadoop-hmart-waimaiad/zhangjin/model/list_ctr_platform_side_model_info_model/20221110</value>
+    </property>
+
+    <!-- 是否使用数据分发自动加载数据checkpoint -->
+    <property>
+        <name>afo.data.check.restore.version</name>
+        <value>False</value>
+    </property>
+
+    <!-- 如果不配置该项，对于大作业可能会出现am内存不足的现象，所以建议配置，将AM的内存大小配置>    为10G-->
+    <property>
+        <name>afo.app.am.resource.mb</name>
+        <value>6144</value>
+    </property>
+    <property>
+        <name>afo.data.packet.size</name>
+        <value>50</value>
+    </property>
+    <property>
+        <name>afo.data.shm.buffer.size</name>
+        <value>1024</value>
+    </property>
+    <!-- 迭代轮数 -->
+    <property>
+        <name>afo.data.max.epoch</name>
+        <value>1</value>
+    </property>
+    <property>
+        <name>afo.app.marking-finish-roles</name>
+        <value>worker</value>
+    </property>
+    <!-- shuffle 数据-->
+    <property>
+        <name>afo.data.dispatch.policy</name>
+        <value>com.meituan.hadoop.afo.tensorflow.data.policy.ShufflePolicy</value>
+    </property>
+    <!-- 是否使用数据分发自动加载数据checkpoint -->
+    <!-- 开启异步dump checkpoint -->
+    <property>
+        <name>afo.data.async.save.ckpt</name>
+        <value>true</value>
+    </property>
+
+    <property>
+        <name>afo.engine.tensorflow.use.seastar</name>
+        <value>true</value>
+    </property>
+    <property>
+       <name>afo.role.worker.container.relax</name>
+       <value>true</value>
+    </property>
+    <!-- 保证没有不满足batch size的batch -->
+    <property>
+       <name>afo.data.epoch.separate</name>
+       <value>false</value>
+    </property>
+
+    <!-- 大象提醒相关配置-->
+    <!-- 大象消息接收者,必填，无该配置（或为空）则表示不使用提醒功能-->
+    <property>
+        <name>afo.xm.notice.receivers.account</name>
+        <value>zhangjin11</value>
+    </property>
+    <property>
+        <name>afo.app.yarn.allocate.timeout.seconds</name>
+        <value>10800</value>
+    </property>
+    <property>
+        <name>afo.data.ask.save.ckpt.timeout</name>
+        <value>6000</value>
+    </property>
+    <property>
+        <name>afo.role.ps.env.TF_HDFS_CLIENT_JVM_MEM_M</name>
+        <value>16384</value>
+    </property>
+    <property>
+        <name>afo.data.packet.ignore.error</name>
+        <value>true</value>
+    </property>
+    <property>
+        <name>afo.role.chief.env.TF_HDFS_CLIENT_JVM_MEM_M</name>
+        <value>16384</value>
+    </property>
+    <!--<property>-->
+        <!--<name>afo.app.am.opts</name>-->
+        <!--<value>-XX:-OmitStackTraceInFastThrow -Xmx9000m</value>-->
+    <!--</property>-->
+    <!--<property>-->
+        <!--<name>afo.app.am.opts</name>-->
+        <!--<value>-XX:-OmitStackTraceInFastThrow -Xmx9000m</value>-->
+    <!--</property>-->
+</configuration>
