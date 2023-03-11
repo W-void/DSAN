@@ -63,8 +63,3 @@
     sh shell/submit_dist_task_speed_debug.sh exp/user/debug train
 
 5. 设置断点，在python代码中增加pdb，进行断点调试。
-
-
-#### 参数搜索
-python tools/exp_generator.py --utype GPU --exp exp/team/2023H1/search_module_20230109/gpu_search_module_v2_obo
-支持 module_one_add（base+1 modoule）、module_seq_add（[base+1]+1 module）、lr_search(learning rate)
