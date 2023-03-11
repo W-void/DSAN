@@ -1,3 +1,10 @@
+核心代码在（分数据集）：
+
+./handle_layer/handle_lib/multi_scene_lib/meituan/meituan_merge.py
+./handle_layer/handle_lib/multi_scene_lib/eleme/eleme_merge.py
+./handle_layer/handle_lib/multi_scene_lib/taobao/taobao_merge.py
+
+---
 注意：所有执行脚本的目录为项目根目录，不要去shell底下执行会报错！！！
 注意：注意文件夹名称就是model_name！！！最后没有斜杠！！！
 
