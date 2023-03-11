@@ -22,7 +22,7 @@
 
 
 #### GPU 流程
-0. 创建自己的实验路径，将exp/dongjian/2023H1/M1/adgpu_cat_search_v4 下的文件拷备到实验路径下. 注意复制gpu下的实验的东西，改了很多xml配置。
+0. 创建自己的实验路径，将[实验路径，如exp/user1/sigir/gpu/base] 下的文件拷备到实验路径下. 注意复制gpu下的实验的东西，改了很多xml配置。
 
 1. 训练Train
    sh shell/gpu_submit_dist_task_speed.sh [实验路径，如exp/user1/sigir/gpu/base] train
