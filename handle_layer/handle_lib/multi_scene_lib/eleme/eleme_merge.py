@@ -135,45 +135,6 @@ class elemeMerge(InputBase):
             att = att * tf.cast(seq_mask[:, :, None], tf.float32)
 
             return tf.reduce_mean(att * seq_poi_emb, 1, keep_dims=True) #[B, 8]
-
-    def seq_split(self, target, input_seq, scene_id_seq, scene_id_list, name):
-        with tf.variable_scope('seq_split_' + name, reuse=tf.AUTO_REUSE):
-            seq_len = input_seq.shape[1]
-            target = self.my_dense(target, self.base_embed_dim, name='seq_split_dense' + name)
-            input_seq = self.my_dense(input_seq, self.base_embed_dim, name='seq_split_dense' + name)
-            target_rep = tf.tile(target, [1, seq_len, 1])
-            din_input = tf.concat([target_rep, input_seq], axis=-1) # [B, seq_len, emb]
-            ans = []
-            att = self.my_dense(din_input, 1, name='seq_split', activation=tf.nn.sigmoid) # [B, seq_len, 1]
-            for i in range(len(scene_id_list)):
-                att_mask = tf.where(tf.equal(scene_id_seq[:, :, None], scene_id_list[i]), att, tf.zeros_like(att)) # [B, seq_len, 1]
-                output = tf.reduce_sum(att_mask * din_input, axis=1) # [B, emb]
-                ans.append(output)
-            return ans
-
-    def target_agg(self, split_emb_list, scene_id_list, target_scene_id, slot, name):
-        with tf.variable_scope('target_agg_' + name, reuse=tf.AUTO_REUSE):
-            reweight_matrix_share = tf.get_variable('reweight_matrix_share_' + name, shape=[1, 1, len(scene_id_list)],
-		                                            initializer=tf.random_normal_initializer())
-            reweight_matrix = tf.get_variable('reweight_matrix_' + name, shape=[1, len(scene_id_list) + 1, len(scene_id_list)],
-		                                initializer=tf.random_normal_initializer())
-            target_scene_id_one_hot = tf.one_hot(target_scene_id, depth=len(scene_id_list) + 1) # [B, 1, n+1]
-            self.logger.info("target_scene_id_one_hot:{}".format(target_scene_id_one_hot))
-            weight = tf.matmul(target_scene_id_one_hot, reweight_matrix) # [B, 1, n]
-            # weight = weight + reweight_matrix_share
-            weight = tf.tanh(weight)
-            self.logger.info("weight:{}".format(weight))
-            split_emb = tf.stack(split_emb_list, -1) # [B, emb, n]
-            output = (1+weight) * split_emb
-            output = tf.reduce_mean(output, -1) # [B, emb]
-            self.logger.info("output:{}".format(output))
-            return output
-
-    def seq_split_target_agg(self, target, target_scene_id, slot, input_seq, scene_id_seq, scene_id_list, name):
-        with tf.variable_scope('seq_split_target_agg_' + name, reuse=tf.AUTO_REUSE):
-            split_list = self.seq_split(target, input_seq, scene_id_seq, scene_id_list, name)
-            agg_result = self.target_agg(split_list, scene_id_list, target_scene_id, slot, name)
-            return tf.layers.flatten(agg_result)
     
     def my_dense(self, inputs, output_dims, name, activation=tf.nn.relu):
         with tf.variable_scope('dense_layer_' + name, reuse=tf.AUTO_REUSE):
@@ -197,35 +158,6 @@ class elemeMerge(InputBase):
             self.logger.info('#WSL: cur_output %s', cur_output)
         can_output = tf.reshape(cur_output, [batch_size, -1, self.can_input_dim]) # [B, 300, 8]
         return can_output
-
-    def mmoe_unit(self, trace_scene_list, can_input, name):
-        #
-        #can_input : [B, 300, emb]
-        #
-        # can_input = my_dense(can_input, base_embed_dim, 'MMOE_export_input'+name) # [B, 300, 8]
-
-        trace_scene_list_emb = self.ptable_lookup2(list_ids=trace_scene_list, v_name=self.__class__.__name__+'mmoe_unit_lookup_'+name)
-        can_output = self.can_unit(can_input, trace_scene_list_emb) # [B, 300, 8]
-        return can_output
-
-    def mmoe_model(self, model_input, scene_input, share_export_num, specific_export_num, name):  
-        with tf.variable_scope('mmoe_model' + name, reuse=tf.AUTO_REUSE):
-            # 1. export
-            can_input = self.my_dense(model_input, self.base_embed_dim, 'MMOE_export_input') # [B, 300, 8]                    
-            export_output = [self.mmoe_unit(scene_input + 10*i, can_input, 'MMOE_spec_export_%d'%i) for i in range(specific_export_num)] # [B, 300, 8]
-
-            for i in range(share_export_num):
-                e_o_1 = self.my_dense(model_input, self.base_embed_dim, 'MMOE_export_%d_1'%i) # [B, 300, 8]
-                e_o_2 = self.my_dense(e_o_1, self.base_embed_dim, 'MMOE_export_%d_2'%i) # [B, 300, 8]
-                export_output.append(e_o_2)
-            export_output = tf.stack(export_output, -1) # [B, 300, emb, 4+4]
-            # 2. gate, this is not MMOE, but is one-gate MOE
-            gate_att = self.my_dense(model_input, share_export_num + specific_export_num, 'MMOE_gate')
-            gate_att = tf.nn.softmax(gate_att, -1)
-            gate_output = tf.reduce_mean(export_output * gate_att[:, :, None, :], -1) # [B, 300, emb]
-            # 3. mlp tower
-            can_output = self.mmoe_unit(scene_input + 10 * specific_export_num, gate_output, 'MMOE_mlp') # [B, 300, 8]
-            return can_output
     
     def get_scene_params(self, scene_id_list, slot, share_export_num, specific_export_num, name):
         with tf.variable_scope('get_scene_params' + name, reuse=tf.AUTO_REUSE):
