@@ -1,2 +1,2 @@
 
-nohup sh shell/total_chain__submit_train_eval_calauc.sh exp/wangshuli03/sigir/cpu/meituan_merge1 &
+nohup sh shell/total_chain__submit_train_eval_calauc.sh exp/xxx/sigir/cpu/meituan_merge1 &
